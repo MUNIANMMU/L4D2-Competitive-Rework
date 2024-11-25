@@ -90,6 +90,10 @@
 		{
 			"name" "3v3 ZoneHunters"
 		}
+		"cul3v3"
+		{     
+		     "name" "cul3v3"
+		}
 	}
 	"2V2 Configs"
 	{
@@ -170,10 +174,6 @@
 		"blackjockey"
 		{
 			"name" "黑神话悟空"
-		}
-		"c4s2ghost"
-		{
-			"name" "幽灵模式"
 		}
 		"cul3v3"
 		{     
