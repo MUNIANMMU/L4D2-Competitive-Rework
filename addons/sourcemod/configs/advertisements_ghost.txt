@@ -1,0 +1,33 @@
+// Advertisements 2.1
+// by Tsunami
+//
+// Types
+// -----
+// center: Center message
+// chat: Chat message
+// hint: Hint message
+// menu: Menu message
+// top: Top message
+//
+//能用 default teamcolor lightgreen yellow green
+// Flags (optional)
+// -----
+// Accepts flags of admins that will not see the advertisement.
+// When omitted everyone will see the advertisement.
+// When left empty only admins will see the advertisement.
+
+"Advertisements"
+{
+    "1"
+    {
+        "chat"      "[{green}!{default}] 目前该模式支持C1M2,C5M4,C6M2,C9M2"
+    }
+    "2"
+    {
+        "chat"      "{green}❀ 该模式来源于 {yellow}厨圣头子Nepkey纳百技"
+    }
+    "3"
+    {
+        "chat"      "{green}❀~"
+    }
+}
