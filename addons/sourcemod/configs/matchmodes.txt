@@ -182,6 +182,14 @@
 		"culmod"
 		{
 		     "name" "culmod"
-		}     
+		}  
+		"c4s2ghost"
+	    {
+	 	     "name" "幽灵模式 - 歼灭"
+	    }
+	    "c4s2ghostt"
+	    {
+		    "name" "幽灵模式 - 感染"
+	    }   
 	}
 }
