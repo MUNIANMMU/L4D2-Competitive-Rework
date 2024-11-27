@@ -16,7 +16,7 @@
 		}
 		"zonemod4K"
 		{
-			"name"	"ZoneMod Quad(4控)"
+			"name"	"ZoneMod 4控"
 		}
 		"hyzmtf"
 		{
@@ -26,6 +26,9 @@
         {
             "name" "Advanced 进阶包抗"
         }
+		"advanced8v8"
+		{
+			 "name" "Advanced 进阶包抗8v8"
 		"zonehunters"
 		{
 			"name" "ZoneHunters 2.8.9"
@@ -175,13 +178,9 @@
 		{
 			"name" "黑神话悟空"
 		}
-		"cul3v3"
-		{     
-		     "name" "cul3v3"
-		}
 		"culmod"
 		{
-		     "name" "culmod"
+		     "name" "包抗(意义不明)"
 		}  
 		"c4s2ghost"
 	    {
