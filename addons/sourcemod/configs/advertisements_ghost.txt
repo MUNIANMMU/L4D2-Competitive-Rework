@@ -24,7 +24,7 @@
     }
     "2"
     {
-        "chat"      "{green}❀ 该模式来源于 {yellow}厨圣头子Nepkey纳百技"
+        "chat"      "{green}❀ "
     }
     "3"
     {
