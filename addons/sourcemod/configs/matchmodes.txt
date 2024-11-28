@@ -29,6 +29,7 @@
 		"advanced8v8"
 		{
 			 "name" "Advanced 进阶包抗8v8"
+		}
 		"zonehunters"
 		{
 			"name" "ZoneHunters 2.8.9"
