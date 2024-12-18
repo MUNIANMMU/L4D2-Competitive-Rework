@@ -167,6 +167,10 @@
 		{
 			"name" "ZoneMod 8v8"
 		}
+		"advanced8v8"
+		{
+			 "name" "Advanced 进阶包抗8v8"
+		}
 		"hideseek"
 		{
 			"name" "躲猫猫捏"
@@ -174,6 +178,10 @@
 		"blackjockey"
 		{
 			"name" "黑神话悟空"
+		}
+		"shenqimod"
+		{
+		     "name" "栓狙包抗"
 		}
 		"culmod"
 		{
@@ -190,10 +198,6 @@
 		"goldoff"
 		{
 			"name" "大枪对抗！！"
-		}
-		"advanced8v8"
-		{
-			 "name" "Advanced 进阶包抗8v8"
-		}  
+		}   
 	}
 }
