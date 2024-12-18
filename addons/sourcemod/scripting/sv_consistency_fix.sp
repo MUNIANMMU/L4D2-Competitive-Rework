@@ -2,20 +2,21 @@
 #pragma newdecls required
 
 #include <sourcemod>
+#include <colors>
 
 bool
-	g_bIsEventHook = false;
+	g_bIsEventHook;
 
 ConVar
-	g_hCvarServerMessageToggle = null,
-	g_hCvarServerWelcomeMessage = null;
+	g_hCvarServerMessageToggle,
+	g_hCvarServerWelcomeMessage;
 
 public Plugin myinfo =
 {
 	name = "sv_consistency fixes",
 	author = "step, Sir, A1m`",
 	description = "Fixes multiple sv_consistency issues.",
-	version = "1.4.3",
+	version = "1.4.1",
 	url = "https://github.com/SirPlease/L4D2-Competitive-Rework/"
 };
 
@@ -25,7 +26,7 @@ public void OnPluginStart()
 		SetFailState("Couldn't find whitelist.cfg");
 	}
 	
-	g_hCvarServerMessageToggle = CreateConVar( \
+	g_hCvarServerMessageToggle = g_hCvarServerWelcomeMessage = CreateConVar( \
 		"svctyfix_message_enable", \
 		"1.0", \
 		"Enable print message in console when player join.", \
@@ -45,12 +46,12 @@ public void OnPluginStart()
 		FCVAR_REPLICATED \
 	);
 	
-	hConsistencyCheckInterval.SetInt(999999);
-	
 	ToggleMessage();
 	g_hCvarServerMessageToggle.AddChangeHook(Cvar_Changed);
 	
 	RegAdminCmd("sm_consistencycheck", Cmd_ConsistencyCheck, ADMFLAG_RCON, "Performs a consistency check on all players.");
+
+	hConsistencyCheckInterval.SetInt(999999);
 	
 	LoadTranslations("common.phrases"); // Load translations (for targeting player)
 }
@@ -62,13 +63,11 @@ void ToggleMessage()
 			HookEvent("player_connect_full", Event_PlayerConnectFull, EventHookMode_Post);
 			g_bIsEventHook = true;
 		}
-
-		return;
-	}
-
-	if (g_bIsEventHook) {
-		UnhookEvent("player_connect_full", Event_PlayerConnectFull, EventHookMode_Post);
-		g_bIsEventHook = false;
+	} else {
+		if (g_bIsEventHook) {
+			UnhookEvent("player_connect_full", Event_PlayerConnectFull, EventHookMode_Post);
+			g_bIsEventHook = false;
+		}
 	}
 }
 
@@ -77,9 +76,9 @@ void Cvar_Changed(ConVar hConVar, const char[] sOldValue, const char[] sNewValue
 	ToggleMessage();
 }
 
-public void OnClientConnected(int iClient)
+public void OnClientConnected(int client)
 {
-	ClientCommand(iClient, "cl_consistencycheck");
+	ClientCommand(client, "cl_consistencycheck");
 }
 
 void Event_PlayerConnectFull(Event hEvent, const char[] sEventName, bool bDontBroadcast)
@@ -109,7 +108,6 @@ Action PrintWhitelist(Handle hTimer, any iUserId)
 		PrintToConsole(iClient, " ");
 		PrintToConsole(iClient, " ");
 	}
-
 	return Plugin_Stop;
 }
 
@@ -117,11 +115,9 @@ Action Cmd_ConsistencyCheck(int iClient, int iArgs)
 {
 	if (iArgs < 1) {
 		for (int i = 1; i <= MaxClients; i++) {
-			if (!IsClientInGame(i) || IsFakeClient(i)) {
-				continue;
+			if (IsClientInGame(i) && !IsFakeClient(i)) {
+				ClientCommand(i, "cl_consistencycheck");
 			}
-	
-			ClientCommand(i, "cl_consistencycheck");
 		}
 		
 		ReplyToCommand(iClient, "Started checking the consistency of files for all players!");
