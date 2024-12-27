@@ -14,6 +14,10 @@
 		{
 			"message" "解除Lerps限制"
 		}
+		"sm_restartmap"
+		{
+		     "message" "重启地图" 
+		}
 	}
 
 	"更改全体语音（alltalk）"
@@ -39,7 +43,18 @@
 			"message" "投票旁观（votespec）"
 		}
 	}
-
+	
+     "开关Mod"
+	{
+		"exec vote/mod_on.cfg"
+		{
+			"message" "开启Mod"
+		}
+		"exec vote/mod_off.cfg"
+		{
+			"message" "关闭Mod"
+		}
+	}
 	"官方地图（official maps）"
 	{
 	    "changelevel c1m1_hotel"
@@ -180,6 +195,18 @@
 		"changelevel c5m1_darkwaterfront"
 		{
 			"message" "黑暗教区"
+		}
+		"changelevel l4d2_deathtoll01_clam"
+		{
+		     "message" "c10改"
+		}
+		"changelevel daredux_map1_docks_aw"
+		{
+		     "message" "c11改"
+		}
+		"changelevel fos1m1_hill"
+		{
+		     "message" "fos"
 		}
 	}
 
