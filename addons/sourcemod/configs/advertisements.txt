@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Advertisements 2.1
 // by Tsunami
 //
@@ -40,4 +41,50 @@
         "chat"      "[{green}!{default}] 本服包含3方地图！"
     }
     
+=======
+// Advertisements 2.1
+// by Tsunami
+//
+// Types
+// -----
+// center: Center message
+// chat: Chat message
+// hint: Hint message
+// menu: Menu message
+// top: Top message
+//
+//能用 default teamcolor lightgreen yellow green
+// Flags (optional)
+// -----
+// Accepts flags of admins that will not see the advertisement.
+// When omitted everyone will see the advertisement.
+// When left empty only admins will see the advertisement.
+
+"Advertisements"
+{
+    "1"
+    {
+        "chat"      "[{green}!{default}] 本服标签为hana,防止失联的最好方法是加群:489962242"
+    }
+    "2"
+    {
+        "chat"      "[{green}!{default}] 本群服经常组织内战 8v8等项目游玩,加群暴打狗群友吧~群:489962242"
+    }
+    "3"
+    {
+        "chat"      "[{green}!{default}] 本服提供三方地图对抗 /maps投票更换喵,有想玩的地图请联系群管理"
+    }
+    "4"
+    {
+        "chat"      "[{green}!{default}] 本服严禁{green}外挂{default},{green}霸服{default},{green}辱骂等恶劣行为{default};逮到可就可就了"
+    }
+    "5"
+    {
+        "chat"      "[{green}!{default}] 群不搞你求群烂梗,佬文化,纯纯打给木"
+    }
+    "6"
+    {
+        "chat"      "[{green}!{default}] Steam组别忘记加了喵~"
+    }
+>>>>>>> upstream/master
 }

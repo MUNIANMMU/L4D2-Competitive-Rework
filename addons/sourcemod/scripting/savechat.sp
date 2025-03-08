@@ -36,6 +36,7 @@ public void OnPluginStart()
 	g_hCvarEnable = 	CreateConVar("savechat_enable", 			"1", "0=Plugin off, 1=Plugin on.", FCVAR_NOTIFY, true, 0.0, true, 1.0); 
 	g_hCvarConsole = 	CreateConVar("savechat_cosole_command", 	"1", "If 1, Record and save console commands.", FCVAR_NOTIFY, true, 0.0, true, 1.0); 
 	CreateConVar("sm_savechat_version", PLUGIN_VERSION, "Save Player Chat Messages Plugin",  FCVAR_NOTIFY|FCVAR_DONTRECORD|FCVAR_SPONLY);
+	AutoExecConfig(true, "savechat");
 	
 	GetCvars();
 	hostport.AddChangeHook(ConVarChanged_Cvars);

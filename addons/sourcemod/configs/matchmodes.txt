@@ -8,11 +8,11 @@
 		}
 		"zonemod"
 		{
-			"name" "ZoneMod 2.8.9"
+			"name" "ZoneMod 2.8.9e"
 		}
 		"zoneretro"
 		{
-			"name" "ZoneMod Retro 2.8.9"
+			"name" "ZoneMod Retro 2.8.9e"
 		}
 		"zonemod4K"
 		{
@@ -171,7 +171,15 @@
 		{
 			 "name" "Advanced 进阶包抗8v8"
 		}
+<<<<<<< HEAD
 		"hideseek"
+=======
+		"zm_carplayplus"
+		{
+			"name" "好多铁哦(仅限官图)"
+		}
+		"advanced"
+>>>>>>> upstream/master
 		{
 			"name" "躲猫猫捏"
 		}

@@ -2,16 +2,17 @@
 #pragma newdecls required
 
 #include <sourcemod>
-#include <builtinvotes>
 #include <sdktools>
+#include <sdkhooks>
+#include <builtinvotes>
 #include <l4d2util>
 #include <left4dhooks>
 #include <colors>
+
 #undef REQUIRE_PLUGIN
 #include <l4d2_playstats>
-#undef REQUIRE_PLUGIN
-#include <sdkhooks>
 //#include <readyup>
+#define REQUIRE_PLUGIN
 
 #define SECTION_NAME "CTerrorGameRules::SetCampaignScores"
 #define LEFT4FRAMEWORK_GAMEDATA "left4dhooks.l4d2"
@@ -73,6 +74,7 @@ bool 	g_bCMapTransitioned = false,
 Handle g_hForwardStart;
 Handle g_hForwardNext;
 Handle g_hForwardEnd;
+Handle g_hForwardInterrupt;
 
 Handle g_hCountDownTimer;
 Handle g_hCMapSetCampaignScores;
@@ -89,6 +91,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 	g_hForwardNext = CreateGlobalForward("OnCMTNextKnown", ET_Ignore, Param_String );
 	// After last map is played; no params
 	g_hForwardEnd = CreateGlobalForward("OnCMTEnd", ET_Ignore );
+	// When mixmap was interrupted and forced to stop; no params.
+	g_hForwardInterrupt = CreateGlobalForward("OnCMTInterrupt", ET_Ignore);
 
 	MarkNativeAsOptional("PLAYSTATS_BroadcastRoundStats");
 	MarkNativeAsOptional("PLAYSTATS_BroadcastGameStats");
@@ -105,18 +109,20 @@ public void OnPluginStart()
 	g_cvFinaleEndStart	= CreateConVar("l4d2mm_finale_end_start",	"1",	"Determine whether to remixmap in the end of finale; 0 = disable;1 = enable", _, true, 0.0, true, 1.0);
 
 	//Servercmd 服务器指令（用于cfg文件）
-	RegServerCmd("sm_addmap", Command_AddMap, "Add a map to the maplist under specified tags");
-	RegServerCmd("sm_tagrank", Command_TagRank, "Set tag rank for map selection");
+	RegServerCmd( "sm_addmap", AddMap);
+	RegServerCmd( "sm_tagrank", TagRank);
 
-	RegAdminCmd("sm_manualmixmap", Command_ManualMixmap, ADMFLAG_ROOT, "Start mixmap with specified maps 启用mixmap加载特定地图顺序的地图组");
-	RegAdminCmd("sm_fmixmap", Command_ForceMixmap, ADMFLAG_ROOT, "Force start mixmap (arg1 empty for 'default' maps pool) 强制启用mixmap（随机官方地图）");
-	RegConsoleCmd("sm_mixmap", Command_Mixmap, "Vote to start a mixmap (arg1 empty for 'default' maps pool);通过投票启用Mixmap，并可加载特定的地图池；无参数则启用官图顺序随机");
-	RegConsoleCmd("sm_stopmixmap", Command_StopMixmap, "Stop a mixmap;中止mixmap，并初始化地图列表");
-	RegAdminCmd("sm_fstopmixmap", Command_ForceStopMixmap, ADMFLAG_ROOT, "Force stop a mixmap ;强制中止mixmap，并初始化地图列表");
+	//Start/Stop 启用/中止指令
+	RegAdminCmd( "sm_manualmixmap", ManualMixmap, ADMFLAG_ROOT, "Start mixmap with specified maps 启用mixmap加载特定地图顺序的地图组");
+	RegAdminCmd( "sm_fmixmap", ForceMixmap, ADMFLAG_ROOT, "Force start mixmap (arg1 empty for 'default' maps pool) 强制启用mixmap（随机官方地图）");
+	RegConsoleCmd( "sm_mixmap", Mixmap_Cmd, "Vote to start a mixmap (arg1 empty for 'default' maps pool);通过投票启用Mixmap，并可加载特定的地图池；无参数则启用官图顺序随机");
+	RegConsoleCmd( "sm_stopmixmap",	StopMixmap_Cmd, "Stop a mixmap;中止mixmap，并初始化地图列表");
+	RegAdminCmd( "sm_fstopmixmap",	StopMixmap, ADMFLAG_ROOT, "Force stop a mixmap ;强制中止mixmap，并初始化地图列表");
 
-	RegConsoleCmd("sm_maplist", Command_Maplist, "Show the map list; 展示mixmap最终抽取出的地图列表");
-	RegAdminCmd("sm_allmap", Command_ShowAllMaps, ADMFLAG_ROOT, "Show all official maps code; 展示所有官方地图的地图代码");
-	RegAdminCmd("sm_allmaps", Command_ShowAllMaps, ADMFLAG_ROOT, "Show all official maps code; 展示所有官方地图的地图代码");
+	//Midcommand 插件启用后可使用的指令
+	RegConsoleCmd( "sm_maplist", Maplist, "Show the map list; 展示mixmap最终抽取出的地图列表");
+	RegAdminCmd( "sm_allmap", ShowAllMaps, ADMFLAG_ROOT, "Show all official maps code; 展示所有官方地图的地图代码");
+	RegAdminCmd( "sm_allmaps", ShowAllMaps, ADMFLAG_ROOT, "Show all official maps code; 展示所有官方地图的地图代码");
 
 	// HookEvent("player_left_start_area", LeftStartArea_Event, EventHookMode_PostNoCopy);
 	// HookEvent("round_start", RoundStart_Event, EventHookMode_PostNoCopy);
@@ -125,7 +131,7 @@ public void OnPluginStart()
 	PluginStartInit();
 	LoadTranslations("l4d2_mixmap.phrases");
 	
-	//AutoExecConfig(true, "l4d2_mixmap");
+	AutoExecConfig(true, "l4d2_mixmap");
 }
 
 void PluginStartInit() 
@@ -217,6 +223,9 @@ public void OnMapStart() {
 		{
 			PluginStartInit();
 			CPrintToChatAll("%t", "Differ_Abort");
+            
+			Call_StartForward(g_hForwardInterrupt);
+			Call_Finish();
 			return;
 		}
 	}
@@ -351,7 +360,7 @@ public Action Timed_ContinueMixmap(Handle timer)
 // ----------------------------------------------------------
 
 // Loads a specified set of maps
-public Action Command_ForceMixmap(int client, int args)
+public Action ForceMixmap(int client, int args) 
 {
 	Format(cfg_exec, sizeof(cfg_exec), CFG_DEFAULT);
 	
@@ -392,7 +401,7 @@ public Action Command_ForceMixmap(int client, int args)
 }
 
 // Load a specified set of maps
-public Action Command_ManualMixmap(int client, int args) 
+public Action ManualMixmap(int client, int args) 
 {
 	if (args < 1) 
 	{
@@ -414,7 +423,7 @@ public Action Command_ManualMixmap(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Command_ShowAllMaps(int client, int args) 
+public Action ShowAllMaps(int client, int Args)
 {
 	CPrintToChat(client, "%t", "AllMaps_Official");
 	CPrintToChat(client, "c1m1_hotel,c1m2_streets,c1m3_mall,c1m4_atrium");
@@ -449,7 +458,7 @@ public void LeftStartArea_Event(Event event, const char[] name, bool dontBroadca
 	bLeftStartArea = true;
 } */
 
-public Action Command_Mixmap(int client, int args) 
+public Action Mixmap_Cmd(int client, int args) 
 {
 	if (IsClientAndInGame(client))
 	{
@@ -588,7 +597,7 @@ public Action Mixmap()
 }
 
 // Display current map list
-public Action Command_Maplist(int client, int args) 
+public Action Maplist(int client, int args) 
 {
 	if (! g_bMaplistFinalized) 
 	{
@@ -629,7 +638,7 @@ public Action Command_Maplist(int client, int args)
 }
 
 // Abort a currently loaded mapset
-public Action Command_StopMixmap(int client, int args) 
+public Action StopMixmap_Cmd(int client, int args) 
 {
 	if (!g_bMapsetInitialized ) 
 	{
@@ -731,7 +740,7 @@ public Action StartVoteStopMixmap_Timer(Handle timer)
 	return Plugin_Handled;
 }
 
-public Action Command_ForceStopMixmap(int client, int args) 
+public Action StopMixmap(int client, int args) 
 {
 	if (!g_bMapsetInitialized) 
 	{
@@ -788,19 +797,19 @@ public Action Timed_PostMapSet(Handle timer)
 
 // Returns a handle to the first array which is found to contain the specified mapname
 // (should be the first and only one)
-stock Handle GetPoolThatContainsMap(char[] map, char[] tag) 
+stock Handle GetPoolThatContainsMap(char[] map, int index, char[] tag) 
 {
-    Handle hArrayMapPool;
+	Handle hArrayMapPool;
 
-    for (int i = 0; i < GetArraySize(g_hArrayTags); i++) 
-    {
-        GetArrayString(g_hArrayTags, i, tag, BUF_SZ);
-        GetTrieValue(g_hTriePools, tag, hArrayMapPool);
-        if (FindStringInArray(hArrayMapPool, map) >= 0) {
-            return hArrayMapPool;
-        }
-    }
-    return INVALID_HANDLE;
+	for (int i = 0; i < GetArraySize(g_hArrayTags); i++) 
+	{
+		GetArrayString(g_hArrayTags, i, tag, BUF_SZ);
+		GetTrieValue(g_hTriePools, tag, hArrayMapPool);
+		if ((index = FindStringInArray(hArrayMapPool, map)) >= 0) {
+			return hArrayMapPool;
+		}
+	}
+	return INVALID_HANDLE;
 }
 
 stock void SelectRandomMap() 
@@ -888,13 +897,13 @@ public Action Timed_GiveThemTimeToReadTheMapList(Handle timer)
 }
 
 // Specifiy a rank for a given tag
-public Action Command_TagRank(int args) 
-{
+public Action TagRank(int args) {
 	if (args < 2) 
 	{
 		ReplyToCommand(0, "Syntax: sm_tagrank <tag> <map number>");
 		ReplyToCommand(0, "Sets tag <tag> as the tag to be used to fetch maps for map <map number> in the map list.");
 		ReplyToCommand(0, "Rank 0 is map 1, rank 1 is map 2, etc.");
+
 		return Plugin_Handled;
 	}
 
@@ -920,12 +929,13 @@ public Action Command_TagRank(int args)
 }
 
 // Add a map to the maplist under specified tags
-public Action Command_AddMap(int args) 
+public Action AddMap(int args) 
 {
 	if (args < 2) 
 	{
 		ReplyToCommand(0, "Syntax: sm_addmap <mapname> <tag1> <tag2> <...>");
 		ReplyToCommand(0, "Adds <mapname> to the map selection and tags it with every mentioned tag.");
+
 		return Plugin_Handled;
 	}
 

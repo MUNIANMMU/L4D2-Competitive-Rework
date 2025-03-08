@@ -2,7 +2,7 @@
 {
 	"服务器选项(server setting)"
 	{
-		"sm_killlobbyres;sv_allow_lobby_connect_only 0;sv_force_unreserved 1"
+		"sv_allow_lobby_connect_only 0;sv_force_unreserved 1"
 		{
 			"message" "移除大厅(kill lobbyres)"
 		}
@@ -43,6 +43,7 @@
 			"message" "投票旁观（votespec）"
 		}
 	}
+<<<<<<< HEAD
 	
      "开关Mod"
 	{
@@ -237,4 +238,6 @@
 			"message" "返校(Back To School)"
 		}
 	}
+=======
+>>>>>>> upstream/master
 }
