@@ -103,7 +103,8 @@ function download_plugins() {
         echo_lang "3. Default Competitive" "3. 默认的Zonemod"
         echo_lang "4. Not0721 Coop" "4. Not0721 战役"
         echo_lang "5. Anne's Coop" "5. Anne 药役"
-        echo_lang "6. Custom repository" "6. 自定义"
+        echo_lang "6. MMU" "6. 药抗"
+        echo_lang "7. Custom repository" "7. 自定义"
         read -p "Enter your choice (1-6): " plugin_choice
 
         case $plugin_choice in
@@ -122,7 +123,10 @@ function download_plugins() {
             5)
                 PLUGIN_REPO_URL="https://github.com/fantasylidong/CompetitiveWithAnne.git"
                 ;;
-            6)
+            6)  
+                PLUGIN_REPO_URL="https://github.com/MUNIANMMU/L4D2-Competitive-Rework.git"
+                ;;
+            7)
                 echo_lang "Please enter the custom repository URL:" "请输入自定义库地址:"
                 read PLUGIN_REPO_URL
                 ;;
